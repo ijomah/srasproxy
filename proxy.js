@@ -3,7 +3,7 @@ const app = express();
 const { auth, requiredScopes } = require('express-oauth2-jwt-bearer');
 
 var axios = require("axios").default;
-
+const port = 3000 || env.port || process.env.port;
 
 const axiosInstance = axios.create({
   baseURL: 'https://dev-a5l4tidpguu30ikt.us.auth0.com'
@@ -127,6 +127,6 @@ const checkJwt = auth({
     //   }
     // );
 
-    app.listen(3000, function() {
-      console.log('Listening on http://localhost:3000');
+    app.listen(port, function() {
+      console.log(`Listening on http://localhost:${port}`);
     });
