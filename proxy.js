@@ -12,7 +12,7 @@ const axiosInstance = axios.create({
     // Authorization middleware. When used, the Access Token must
     // exist and be verified against the Auth0 JSON Web Key Set.
 const checkJwt = auth({
-    audience: 'https://dev-a5l4tidpguu30ikt.us.auth0.com/api/v2/',
+    audience: 'https://srasproxy.onrender.com/api/private',
     issuerBaseURL: 'https://dev-a5l4tidpguu30ikt.us.auth0.com/',
   });
 
