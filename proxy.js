@@ -62,7 +62,8 @@ const checkJwt = auth({
         // return mgtApiAccessToken;
       // }
       res.json({
-        message: 'Hello! Token received and authenticated.'
+        message: 'Hello! Token received and authenticated.',
+        apiAccessTok:`${auth0MgtApiAccessToken}`
       });
     });
 
