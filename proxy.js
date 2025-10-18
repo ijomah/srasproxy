@@ -27,8 +27,8 @@ const checkJwt = auth({
     // This route needs authentication
     //next add axios middleware to get token b4 
     app.post('/api/private', function(req, res) {
-      console.log('see me, it reached!')
-      const {accessToken} = req.body;
+      console.log('see me, it reached!',req.headers)
+      const {accessToken} = req.headers;
 
       var auth0MgtApiAccessToken;      
 
