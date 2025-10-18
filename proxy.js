@@ -62,7 +62,7 @@ const checkJwt = auth({
         });
         // return mgtApiAccessToken;
       // }
-      const accessTokenApi = await tokenManager.getAccessToken()
+      const accessTokenApi = tokenManager.getAccessToken()
       res.json({
         message: 'Hello! Token received and authenticated.',
         apiAccessTok:`${accessTokenApi}`
@@ -74,7 +74,7 @@ const checkJwt = auth({
     app.get('/api/private-scoped', checkJwt, checkScopes, function(req, res) {
       const {userId} = req;
       // const getIdpData = (userId, mgtAccessToken) => {
-      const mgtAccessToken = await tokenManager.getAccessToken();
+      const mgtAccessToken = tokenManager.getAccessToken();
         // var options = {
         //   method: 'GET',
         //   url: `/api/v2/users/${userId}`,
