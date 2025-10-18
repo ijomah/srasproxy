@@ -53,10 +53,8 @@ const checkJwt = auth({
       
       
         axios(options).then(function (response) {
-          console.log('authMgtApi file: ', response.data);
-      
           tokenManager.setAccessToken(response.data)
-          // getIdpData(response.data.accessToken);
+          console.log('authMgtApi file: ', response.data);
         }).catch(function (error) {
           console.error('authMgtApi Err: ', error);
         });
