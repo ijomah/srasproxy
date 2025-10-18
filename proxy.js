@@ -5,6 +5,9 @@ const { auth, requiredScopes } = require('express-oauth2-jwt-bearer');
 var axios = require("axios").default;
 const port = 3000 || env.port || process.env.port;
 
+//For-Token-things
+const tokenManager = require('./tokenMgt');
+
 const axiosInstance = axios.create({
   baseURL: 'https://dev-a5l4tidpguu30ikt.us.auth0.com'
 });
@@ -28,9 +31,7 @@ const checkJwt = auth({
     //next add axios middleware to get token b4 
     app.post('/api/private', function(req, res) {
       console.log('see me, it reached!',req.headers)
-      const {accessToken} = req.headers;
-
-      var auth0MgtApiAccessToken;      
+      const {accessToken} = req.headers;  
 
       // const apiAuth0Send = 
       // (tokensObj) => {
@@ -54,16 +55,17 @@ const checkJwt = auth({
         axios(options).then(function (response) {
           console.log('authMgtApi file: ', response.data);
       
-          auth0MgtApiAccessToken = response.data;
+          tokenManager.setAccessToken(response.data)
           // getIdpData(response.data.accessToken);
         }).catch(function (error) {
           console.error('authMgtApi Err: ', error);
         });
         // return mgtApiAccessToken;
       // }
+      const accessTokenApi = await tokenManager.getAccessToken()
       res.json({
         message: 'Hello! Token received and authenticated.',
-        apiAccessTok:`${auth0MgtApiAccessToken}`
+        apiAccessTok:`${accessTokenApi}`
       });
     });
 
@@ -72,7 +74,7 @@ const checkJwt = auth({
     app.get('/api/private-scoped', checkJwt, checkScopes, function(req, res) {
       const {userId} = req;
       // const getIdpData = (userId, mgtAccessToken) => {
-      const mgtAccessToken = auth0MgtApiAccessToken;
+      const mgtAccessToken = await tokenManager.getAccessToken();
         // var options = {
         //   method: 'GET',
         //   url: `/api/v2/users/${userId}`,
