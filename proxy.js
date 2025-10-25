@@ -11,6 +11,9 @@ const tokenManager = require('./tokenMgt');
 const axiosInstance = axios.create({
   baseURL: 'https://dev-a5l4tidpguu30ikt.us.auth0.com'
 });
+const Instance = axios.create({
+  baseURL:'https://dev-a5l4tidpguu30ikt.us.auth0.com'  
+})
 
     // Authorization middleware. When used, the Access Token must
     // exist and be verified against the Auth0 JSON Web Key Set.
@@ -60,6 +63,15 @@ const checkJwt = auth({
         
         // return mgtApiAccessToken;
       // }
+      //make-your-calls-to-userinfo
+        const userInfoResponse = Instance({
+          url:`/userinfo`,
+          method:'get',
+          headers:{
+            'Authorization':`Bearer ${accessToken}`
+          }
+        });
+        console.log('userInfo',userInfoResponse.sub);
 
       axiosInstance.interceptors.response.use(
           (response) => {
@@ -75,20 +87,18 @@ const checkJwt = auth({
         (error) => {
             return Promise.reject(error);
           }
-        );
+      );
 
-        //make-your-calls-to-userinfo
-        const userInfoResponse = axiosInstance.get(`/userinfo`);
-        console.log('userInfo',userInfoResponse.sub);
+        
         const userId = userInfoResponse.sub;
         //For idp token
           const idpResponse = axiosInstance.get(`/api/v2/users/${userId}`);
+          res.json(idpResponse);
         }).catch(function (error) {
           console.error('authMgtApi Err: ', error);
         });
 
-      const accessTokenApi = tokenManager.getAccessToken()
-      res.json(accessTokenApi);
+      // const accessTokenApi = tokenManager.getAccessToken()
     });
 
     const checkScopes = requiredScopes('read:users read:user_idp_tokens');
