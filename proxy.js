@@ -55,8 +55,8 @@ const checkJwt = auth({
         axios(options).then(function (response) {
           tokenManager.setAccessToken(response.data)
           console.log('authMgtApi data: ', response.data);
-          console.log('authMgtApi config: ', response.config);
-          console.log('authMgtApi header: ', response.headers);
+            // console.log('authMgtApi config: ', response.config);
+            // console.log('authMgtApi header: ', response.headers);
         
         // return mgtApiAccessToken;
       // }
@@ -78,10 +78,11 @@ const checkJwt = auth({
         );
 
         //make-your-calls-to-userinfo
-        const userInfoResponse = axiosInstance.get(`/api/v2/userinfo`);
-        console.log('userInfo',userInfoResponse);
+        const userInfoResponse = axiosInstance.get(`/userinfo`);
+        console.log('userInfo',userInfoResponse.sub);
+        const userId = userInfoResponse.sub;
         //For idp token
-          // const idpResponse = axiosInstance.get(`/api/v2/users/${userId}`);
+          const idpResponse = axiosInstance.get(`/api/v2/users/${userId}`);
         }).catch(function (error) {
           console.error('authMgtApi Err: ', error);
         });
@@ -93,7 +94,7 @@ const checkJwt = auth({
     const checkScopes = requiredScopes('read:users read:user_idp_tokens');
 
     app.get('/api/private-scoped', checkJwt, checkScopes, function(req, res) {
-      const {userId} = req;
+      // const {userId} = req;
       // const getIdpData = (userId, mgtAccessToken) => {
       const mgtAccessToken = tokenManager.getAccessToken();
         // var options = {
