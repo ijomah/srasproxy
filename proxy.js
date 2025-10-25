@@ -30,9 +30,9 @@ const checkJwt = auth({
     // This route needs authentication
     //next add axios middleware to get token b4 
     app.post('/api/private', function(req, res) {
-      console.log('see me, it reached!',req.headers)
+      console.log('see me, it reached!')
       const {accessToken} = req.headers;  
-
+      const mgtAccessToken = tokenManager.getAccessToken();
       // const apiAuth0Send = 
       // (tokensObj) => {
         // var mgtApiAccessToken;
@@ -54,20 +54,43 @@ const checkJwt = auth({
       
         axios(options).then(function (response) {
           tokenManager.setAccessToken(response.data)
-          console.log('authMgtApi file: ', response.data);
+          console.log('authMgtApi data: ', response.data);
+          console.log('authMgtApi config: ', response.config);
+          console.log('authMgtApi header: ', response.headers);
+        
+        // return mgtApiAccessToken;
+      // }
+
+      axiosInstance.interceptors.response.use(
+          (response) => {
+            if(response.status===200) {
+              response.headers['Authorization'] = `Bearer ${response.data.access_token}`;
+            }
+            return response;
+          // config = {
+          // url: `/api/v2/users/${userId}`,
+          // params: {q: 'email:"jane@exampleco.com"', search_engine: 'v3'},
+          // headers: {authorization: `Bearer ${mgtAccessToken}`}
+        },
+        (error) => {
+            return Promise.reject(error);
+          }
+        );
+
+        //make-your-calls-to-userinfo
+        const userInfoResponse = axiosInstance.get(`/api/v2/userinfo`);
+        console.log('userInfo',userInfoResponse);
+        //For idp token
+          // const idpResponse = axiosInstance.get(`/api/v2/users/${userId}`);
         }).catch(function (error) {
           console.error('authMgtApi Err: ', error);
         });
-        // return mgtApiAccessToken;
-      // }
+
       const accessTokenApi = tokenManager.getAccessToken()
-      res.json({
-        message: 'Hello! Token received and authenticated.',
-        apiAccessTok:`${accessTokenApi}`
-      });
+      res.json(accessTokenApi);
     });
 
-    const checkScopes = requiredScopes('read:users, read:user_idp_tokens');
+    const checkScopes = requiredScopes('read:users read:user_idp_tokens');
 
     app.get('/api/private-scoped', checkJwt, checkScopes, function(req, res) {
       const {userId} = req;
@@ -80,27 +103,35 @@ const checkJwt = auth({
         //   headers: {authorization: `Bearer ${mgtAccessToken}`}
         // };
 
-        axiosInstance.interceptors.request.use(
-          (config) => {
-            if(mgtAccessToken) {
-              config.headers['Authorization'] = `Bearer ${mgtAccessToken}`;
-            }
-            return config;
-          // config = {
-          // url: `/api/v2/users/${userId}`,
-          // params: {q: 'email:"jane@exampleco.com"', search_engine: 'v3'},
-          // headers: {authorization: `Bearer ${mgtAccessToken}`}
-        },
-        (error) => {
-            return Promise.reject(error);
-          }
-        );
+        // axiosInstance.interceptors.request.use(
+        //   (config) => {
+        //     if(mgtAccessToken) {
+        //       config.headers['Authorization'] = `Bearer ${mgtAccessToken}`;
+        //     }
+        //     return config;
+        //   // config = {
+        //   // url: `/api/v2/users/${userId}`,
+        //   // params: {q: 'email:"jane@exampleco.com"', search_engine: 'v3'},
+        //   // headers: {authorization: `Bearer ${mgtAccessToken}`}
+        // },
+        // (error) => {
+        //     return Promise.reject(error);
+        //   }
+        // );
         
       try{
-        const response = axiosInstance.get(`/api/v2/users/${userId}`)
+        //For user Id
+        const response = axiosInstance.get(`/api/v2/userinfo`)
+        // const response = axiosInstance.get(`/api/v2/users/${userId}`)
           console.log('IDP data: ', response.data);
+          const userId = response.data;
+
+
+          //For idp token
+          const idpResponse = axiosInstance.get(`/api/v2/users/${userId}`);
+
           //Process and return response to react native app
-          res.json(response.data);
+          res.json(idpResponse.data);
        } catch (error) {
           console.error(error);
            //Process and return response to react native app
@@ -109,6 +140,14 @@ const checkJwt = auth({
         }
       // }
 
+      try{
+        const response = axiosInstance.get(`/api/v2/${userId}`);
+        res.json(response.data)
+      } catch(error) {
+        console.log(error)
+        res.json(error);
+        throw error;
+      }
       // //Process and return response to react native app
       // res.json(response.data);
     });

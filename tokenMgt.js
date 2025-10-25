@@ -5,6 +5,7 @@ let tokenExpiration = null;
 //I dont expiration things now
 // const setAccessToken = (token, expiresIn) => {
 const setAccessToken = (token) => {
+    console.log('token-set-sucex')
     accessToken = token.access_token;
     // tokenExpiration = Date.now() + expiresIn * 1000; // Convert to milliseconds
 };
