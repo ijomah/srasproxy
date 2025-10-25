@@ -68,7 +68,7 @@ const checkJwt = auth({
           url:`/userinfo`,
           method:'get',
           headers:{
-            'Authorization':`Bearer ${accessToken}`
+            'Authorization':`${accessToken['Authorization']}`
           }
         });
         console.log('userInfo',userInfoResponse.sub);
